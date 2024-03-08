@@ -1,12 +1,14 @@
 from dependencies import *
 
-from routers import translator
+from routers import translator, ex_translator, ws_translator
 
 from fastapi import File, UploadFile
 from fastapi.responses import HTMLResponse
 
 app = FastAPI()
 app.include_router(translator.router)
+app.include_router(ws_translator.router)
+app.include_router(ex_translator.router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -35,3 +37,6 @@ async def validate_ip(request: Request, call_next):
 @app.get('/')
 async def home():
     return 'Welcome to Translator API'
+
+
+# uvicorn main:app --reload

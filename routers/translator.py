@@ -4,14 +4,12 @@ import librosa
 import io
 # local
 from src.func import return_streaming_audio
-from src.model.seamlees_m4t import *
+# from src.model.seamlees_m4t import *
 
 
 router = APIRouter(
     prefix='/translate'
 )
-
-some_file_path = 'C:/Users/alanh/Downloads/librosa1.wav'
 
 @router.get('/', tags=['translate'])
 async def traslate():
