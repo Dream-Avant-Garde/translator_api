@@ -1,1 +1,1 @@
-from seamlees_m4t import *
+from .seamlees_m4t import *

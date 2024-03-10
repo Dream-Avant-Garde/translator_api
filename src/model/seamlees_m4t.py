@@ -1,28 +1,15 @@
-import io
-import json
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-import mmap
-import numpy
-import soundfile
-import torchaudio
 import torch
-import librosa
+import torchaudio
 
-from collections import defaultdict
-from IPython.display import Audio, display
-from pathlib import Path
-from pydub import AudioSegment
+text_example = 'El examen y testimonio de los expertos permitieron a la comisión concluir que cinco disparos pueden haber sido disparados.'
 
-from seamless_communication.inference import Translator
-from seamless_communication.streaming.dataloaders.s2tt import SileroVADSilenceRemover
 
-model_name = "seamlessM4T_v2_large"
-vocoder_name = "vocoder_v2" if model_name == "seamlessM4T_v2_large" else "vocoder_36langs"
-
-translator = Translator(
-    model_name,
-    vocoder_name,
-    device=torch.device("cuda:0"),
-    dtype=torch.float16,
-)
+def s2st(tgt_lang:str, data:torch.Tensor):
+#   output = translator.predict(
+#       input=data,
+#       task_str="s2st",
+#       tgt_lang=tgt_lang,
+#   )
+  audio_tensor = torch.load('D:/Trabajo/translator_api/audio.pt')
+  output = (text_example, (audio_tensor, 16000))
+  return output
