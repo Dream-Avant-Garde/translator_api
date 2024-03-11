@@ -4,7 +4,7 @@ import librosa
 import io
 # local
 from src.func import return_streaming_audio
-# from src.model.seamlees_m4t import *
+from src.model.seamlees_m4t import *
 
 router = APIRouter(
     prefix='/ws_translate'
@@ -12,7 +12,7 @@ router = APIRouter(
 
 
 @router.get('/', tags=['ws_translate'])
-async def ws_traslate():
+async def ws_translate():
     return 'test'
 
 @router.post('/S2ST', tags=['ws_translate'])
