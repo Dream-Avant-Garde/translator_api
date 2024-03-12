@@ -27,8 +27,8 @@ in_stream = p_audio.open(format=FORMAT,
 
 path = 'C:/Users/alanh/Downloads/librosa1.wav'
 
-url = 'http://127.0.0.1:8000/translate/S2ST'
-# url = 'https://ec2-18-189-185-89.us-east-2.compute.amazonaws.com/'
+# url = 'http://127.0.0.1:8000/translate/S2ST'
+url = 'https://ec2-18-189-185-89.us-east-2.compute.amazonaws.com/translate/S2ST'
 files = {'audio_file': (path.split('/')[-1], open(path, 'rb'), 'audio/wav')}
 headers = {'accept': 'application/json'}
 
