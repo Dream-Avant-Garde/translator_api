@@ -28,19 +28,23 @@ in_stream = p_audio.open(format=FORMAT,
 path = 'C:/Users/alanh/Downloads/librosa1.wav'
 
 url = 'http://127.0.0.1:8000/translate/S2ST'
-# url = 'https://ec2-18-119-115-208.us-east-2.compute.amazonaws.com/'
+# url = 'https://ec2-18-189-185-89.us-east-2.compute.amazonaws.com/'
 files = {'audio_file': (path.split('/')[-1], open(path, 'rb'), 'audio/wav')}
 headers = {'accept': 'application/json'}
 
+r = requests.get(url=url, verify=False)
+print(r.text)
 
 # de esta forma se va poco a poco, reduciendo el tiempo de respuesta
 t = time.time()
 
 while True:
     frames = []
-    for i in range(0, int(RATE / CHUNK * 1)):
+    print('iniciada la grabacion')
+    for i in range(0, int(RATE / CHUNK * 5)):
         data = in_stream.read(CHUNK)
         frames.append(data)
+    print('grabacion completa')
     # b_audio = in_stream.read(CHUNK)
     b_audio = b''.join(frames)
     with io.BytesIO(b_audio) as bytes_io:
@@ -57,11 +61,12 @@ while True:
         files = {'audio_file': (path.split('/')[-1], bytes_io, 'audio/wav')}
         
         # Enviar el archivo WAV a la API
-        with requests.post(url, files=files) as r:
+        with requests.post(url, files=files, verify=False) as r:
+            print(r.headers)
             for chunk in r.iter_content(1024):
                 out_stream.write(chunk)
-                
-        
+    break            
+    
 out_stream.stop_stream()
 out_stream.close()
 p_audio.terminate()

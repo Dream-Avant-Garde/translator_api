@@ -4,7 +4,7 @@ import torchaudio
 import io
 # local
 from src.func import return_streaming_audio
-from src.model import seamlees_m4t 
+# from src.model import seamlees_m4t 
 
 
 router = APIRouter(
