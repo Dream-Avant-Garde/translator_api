@@ -24,8 +24,8 @@ vocoder_name = "vocoder_v2" if model_name == "seamlessM4T_v2_large" else "vocode
 translator = Translator(
     model_name,
     vocoder_name,
-    # device=torch.device("cuda:0"),
-    device=torch.device("cpu"),
+    device=torch.device("cuda:0"),
+    # device=torch.device("cpu"),
     dtype=torch.float16,
 )
 

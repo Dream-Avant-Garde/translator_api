@@ -1,9 +1,12 @@
 ###########################Python####################################
 from typing import Annotated
-from fastapi import FastAPI
 from fastapi import Request, status
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi.responses import HTMLResponse
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+
+
 
 import uvicorn
 
@@ -23,3 +26,7 @@ headers = [ # acepts all headers
 ]
 
 WHITELISTED_IPS = get_valid_ips()
+
+
+#WEBSOCKET CLIENTS
+socket_clients = dict()
