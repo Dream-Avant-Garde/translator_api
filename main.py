@@ -41,26 +41,26 @@ async def home():
     return 'Welcome to Translator API'
 
 
-# @app.websocket("/ws")
-# async def websocket_endpoint(websocket: WebSocket):
-#     try:
-#         await websocket.accept()
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    try:
+        await websocket.accept()
 
-#         while True:
-#             try:
-#                 data = await asyncio.wait_for(websocket.receive_bytes(), timeout=10)
-#             except asyncio.TimeoutError:
-#                 print("La conexión se ha agotado.")
-#                 break
+        while True:
+            try:
+                data = await asyncio.wait_for(websocket.receive_bytes(), timeout=10)
+            except asyncio.TimeoutError:
+                print("La conexión se ha agotado.")
+                break
 
-#             for i in range(0, len(data), 1024):
-#                 await websocket.send_bytes(data[i:i + 1024])
+            for i in range(0, len(data), 1024):
+                await websocket.send_bytes(data[i:i + 1024])
             
 
-#     except WebSocketDisconnect:
-#         print("Cliente desconectado.")
-#     except Exception as e:
-#         print("Error inesperado:", e)
+    except WebSocketDisconnect:
+        print("Cliente desconectado.")
+    except Exception as e:
+        print("Error inesperado:", e)
 
 
 
