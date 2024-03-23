@@ -87,7 +87,7 @@ input_buffer.seek(0)  # Regresar al inicio del buffer
 
 
 async def connect_and_chat():
-    ws = await websockets.connect("ws://localhost:8000/ws")
+    ws = await websockets.connect("wss://3.144.138.81:80/ws/", ssl=False    )
     try:
         # ... su código usando `ws` ...
 

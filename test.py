@@ -66,7 +66,7 @@ input_buffer.seek(0)  # Regresar al inicio del buffer
 # wf.close()
 
 #-------------------------Hacer la request---------------------------------------
-url = f'https://ec2-13-58-143-149.us-east-2.compute.amazonaws.com/translate/S2ST'    
+url = f'https://ec2-3-144-138-81.us-east-2.compute.amazonaws.com/translate/S2ST'    
 # url = f'http://localhost:8000/translate/S2ST'    
 settings = {"tgt_lang": "eng", "description": "Spanish translation", "chuck_size": 2048}
 headers = {'accept': 'application/json'}
