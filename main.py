@@ -3,7 +3,7 @@ from dependencies import *
 from routers import translator, ex_translator, ws_translator
 
 from fastapi import File, UploadFile
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse
 import asyncio
 
 
@@ -98,5 +98,26 @@ async def speech_to_speech_translation(websocket: WebSocket):
         print("Cliente desconectado.")
     # except Exception as e:
     #     print("Error inesperado:", e)
+
+@app.get("/descargar-data-wav")
+async def descargar_data_wav():
+    """
+    Ruta para descargar el archivo data.wav.
+
+    Retorno:
+        Un archivo binario con el contenido del archivo data.wav.
+    """
+
+    # Ruta del archivo en el servidor
+    ruta_archivo = "data.wav"
+
+    # Abrir el archivo en modo binario
+    with open(ruta_archivo, "rb") as archivo:
+        contenido_archivo = archivo.read()
+
+    # Devolver el archivo como respuesta
+
+    return FileResponse(contenido_archivo, filename="data.wav")
+
 
 # uvicorn main:app --reload
