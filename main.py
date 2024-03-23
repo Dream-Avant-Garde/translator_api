@@ -78,25 +78,14 @@ async def speech_to_speech_translation(websocket: WebSocket):
             except asyncio.TimeoutError:
                 print("La conexión se ha agotado.")
                 break
-            wf = wave.open(b_data, 'wb')
-            wf.setnchannels(1)
-            wf.setsampwidth(4)
-            wf.setframerate(16000)
-            wf.writeframes(bytes_data)
-            wf.close()
-            b_data.seek(0)
             
-            data, sampling_rate = torchaudio.load(b_data)
+            data, sampling_rate = torchaudio.load(bytes_data)
             data = data.transpose(0,1)
             output = seamlees_m4t.s2st(tgt_lang,data)
             text, speech = output
-            b_data.seek(0)
-            b_data.truncate(0)
-            b_data.flush()
 
             torchaudio.save(b_data, output[1].audio_wavs[0][0].to(torch.float32).cpu(), speech.sample_rate, format='wav')
             
-            b_data.seek(44)
             await websocket.send_bytes(b_data.read())
 
             b_data.seek(0)
