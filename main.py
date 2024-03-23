@@ -63,11 +63,13 @@ async def websocket_endpoint(websocket: WebSocket):
         print("Error inesperado:", e)
 
 
-@app.websocket("/ws/S2ST/{tgt_lang}")
-async def speech_to_speech_translation(websocket: WebSocket, tgt_lang:str):
+@app.websocket("/ws/S2ST/")
+async def speech_to_speech_translation(websocket: WebSocket):
     try:
+        tgt_lang = 'eng'
         await websocket.accept()
         b_data = io.BytesIO()
+        
 
         while True:
             try:
