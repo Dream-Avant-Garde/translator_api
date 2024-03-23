@@ -105,7 +105,7 @@ async def speech_to_speech_translation(websocket: WebSocket):
                 b_data.flush()
     except WebSocketDisconnect:
         print("Cliente desconectado.")
-    except Exception as e:
-        print("Error inesperado:", e)
+    # except Exception as e:
+    #     print("Error inesperado:", e)
 
 # uvicorn main:app --reload
