@@ -3,7 +3,7 @@ from dependencies import *
 from routers import translator, ex_translator, ws_translator
 
 from fastapi import File, UploadFile
-from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.responses import HTMLResponse, FileResponse, Response
 import asyncio
 
 
@@ -48,7 +48,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
         while True:
             try:
-                data = await asyncio.wait_for(websocket.receive_bytes(), timeout=10)
+                data = await asyncio.wait_for(websocket.receive_bytes(), timeout=100)
             except asyncio.TimeoutError:
                 print("La conexión se ha agotado.")
                 break
@@ -99,25 +99,19 @@ async def speech_to_speech_translation(websocket: WebSocket):
     # except Exception as e:
     #     print("Error inesperado:", e)
 
-@app.get("/descargar-data-wav")
-async def descargar_data_wav():
-    """
-    Ruta para descargar el archivo data.wav.
+@app.get("/descargar-archivo/{nombre_archivo}")
+async def descargar_archivo(nombre_archivo: str):
+    ruta_archivo = f"ruta/a/tu/archivo/{nombre_archivo}"
 
-    Retorno:
-        Un archivo binario con el contenido del archivo data.wav.
-    """
-
-    # Ruta del archivo en el servidor
-    ruta_archivo = "data.wav"
-
-    # Abrir el archivo en modo binario
-    with open(ruta_archivo, "rb") as archivo:
-        contenido_archivo = archivo.read()
-
-    # Devolver el archivo como respuesta
-
-    return FileResponse(contenido_archivo, filename="data.wav")
-
+    try:
+        with open(ruta_archivo, "rb") as archivo:
+            contenido_archivo = archivo.read()
+            headers = {
+                "Content-Disposition": f"attachment; filename={nombre_archivo}",
+                "Content-Type": "application/octet-stream",
+            }
+            return Response(contenido_archivo, headers=headers)
+    except FileNotFoundError:
+        return Response("Archivo no encontrado", status_code=404)
 
 # uvicorn main:app --reload
