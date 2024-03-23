@@ -78,7 +78,7 @@ async def speech_to_speech_translation(websocket: WebSocket):
             except asyncio.TimeoutError:
                 print("La conexión se ha agotado.")
                 break
-            for i in range(0, len(data), len(data)/2):
+            for i in range(0, len(data), len(data)):
                 wf = wave.open(b_data, 'wb')
                 wf.setnchannels(1)
                 wf.setsampwidth(4)
