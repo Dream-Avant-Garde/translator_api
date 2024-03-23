@@ -79,6 +79,9 @@ async def speech_to_speech_translation(websocket: WebSocket):
                 print("La conexión se ha agotado.")
                 break
             
+            with open('data.wav', 'wb') as f:
+                f.write(bytes_data)
+
             data, sampling_rate = torchaudio.load(bytes_data)
             data = data.transpose(0,1)
             output = seamlees_m4t.s2st(tgt_lang,data)
