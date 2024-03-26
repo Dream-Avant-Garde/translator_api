@@ -15,6 +15,7 @@ from src.model import seamlees_m4t
 def get_default_settings():
     return TranslateSettings(
         tgt_lang='eng',
+        description='default',
         chuck_size=1024
     )
 

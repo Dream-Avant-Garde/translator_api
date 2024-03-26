@@ -68,12 +68,12 @@ input_buffer.seek(0)  # Regresar al inicio del buffer
 #-------------------------Hacer la request---------------------------------------
 url = f'https://ec2-52-14-165-24.us-east-2.compute.amazonaws.com/translate/S2ST'    
 # url = f'http://localhost:8000/translate/S2ST'    
-settings = {"tgt_lang": "eng", "description": "Spanish translation", "chuck_size": 2048}
+# settings = {"tgt_lang": "eng", "description": "Spanish translation", "chuck_size": 1024}
 headers = {'accept': 'application/json'}
 files = {'audio_file': ('input.wav', input_buffer, 'audio/wav')}
 
 # con stream response
-with requests.post(url, files=files, verify=False, json=settings) as response:
+with requests.post(url, files=files, verify=False) as response:
     for chunk in response.iter_content(CHUNK):
         stream_out.write(chunk)
 
