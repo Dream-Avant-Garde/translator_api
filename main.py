@@ -1,6 +1,6 @@
 from dependencies import *
 
-from routers import translator, ex_translator, ws_translator
+# from routers import translator, ex_translator, ws_translator
 
 from fastapi import File, UploadFile
 from fastapi.responses import HTMLResponse, FileResponse, Response
@@ -8,9 +8,9 @@ import asyncio
 
 
 app = FastAPI()
-app.include_router(translator.router)
-app.include_router(ws_translator.router)
-app.include_router(ex_translator.router)
+# app.include_router(translator.router)
+# app.include_router(ws_translator.router)
+# app.include_router(ex_translator.router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -52,6 +52,9 @@ async def websocket_endpoint(websocket: WebSocket):
             except asyncio.TimeoutError:
                 print("La conexión se ha agotado.")
                 break
+            
+            with open('data.wav', 'wb') as f:
+                f.write(data)
 
             for i in range(0, len(data), 1024):
                 await websocket.send_bytes(data[i:i + 1024])
@@ -74,15 +77,12 @@ async def speech_to_speech_translation(websocket: WebSocket):
         while True:
             try:
                 bytes_data = await asyncio.wait_for(websocket.receive_bytes(), timeout=10)
-                
+                b_data.write(bytes_data)
             except asyncio.TimeoutError:
                 print("La conexión se ha agotado.")
                 break
-            
-            with open('data.wav', 'wb') as f:
-                f.write(bytes_data)
 
-            data, sampling_rate = torchaudio.load(bytes_data)
+            data, sampling_rate = torchaudio.load(b_data)
             data = data.transpose(0,1)
             output = seamlees_m4t.s2st(tgt_lang,data)
             text, speech = output
@@ -99,19 +99,5 @@ async def speech_to_speech_translation(websocket: WebSocket):
     # except Exception as e:
     #     print("Error inesperado:", e)
 
-@app.get("/descargar-archivo/{nombre_archivo}")
-async def descargar_archivo(nombre_archivo: str):
-    ruta_archivo = f"ruta/a/tu/archivo/{nombre_archivo}"
-
-    try:
-        with open(ruta_archivo, "rb") as archivo:
-            contenido_archivo = archivo.read()
-            headers = {
-                "Content-Disposition": f"attachment; filename={nombre_archivo}",
-                "Content-Type": "application/octet-stream",
-            }
-            return Response(contenido_archivo, headers=headers)
-    except FileNotFoundError:
-        return Response("Archivo no encontrado", status_code=404)
 
 # uvicorn main:app --reload
