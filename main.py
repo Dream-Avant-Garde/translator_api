@@ -88,7 +88,7 @@ async def speech_to_speech_translation(websocket: WebSocket):
             print(sampling_rate)
             data = data.transpose(0,1)
             output = seamlees_m4t.s2st(tgt_lang,data)
-            print(output[1].sampling_rate)
+            print(output[1].sample_rate)
 
             b_data.seek(0)
             b_data.truncate(0)
