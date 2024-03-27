@@ -28,10 +28,11 @@ async def traslate():
     return 'test'
 
 @router.post('/S2ST', tags=['translate'])
-async def speech_to_speech_ranslation(audio_file: UploadFile = File(...), settings: Optional[TranslateSettings] = Depends(get_default_settings)):
+async def speech_to_speech_ranslation(audio_file: UploadFile = File(...)):
     byte_data = await audio_file.read()
     print('entra')
     b_data = io.BytesIO(byte_data)
+    settings = get_default_settings()
 
     data, sampling_rate = torchaudio.load(b_data)
     data = data.transpose(0,1)
