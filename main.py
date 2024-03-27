@@ -81,14 +81,15 @@ async def speech_to_speech_translation(websocket: WebSocket):
             except asyncio.TimeoutError:
                 print("La conexión se ha agotado.")
                 break
-
+            b_data.seek(0)
+            print(bytes_data[0:44])
             data, sampling_rate = torchaudio.load(b_data)
             data = data.transpose(0,1)
             output = seamlees_m4t.s2st(tgt_lang,data)
             text, speech = output
 
             torchaudio.save(b_data, output[1].audio_wavs[0][0].to(torch.float32).cpu(), speech.sample_rate, format='wav')
-            
+            b_data.seek(0)
             await websocket.send_bytes(b_data.read())
 
             b_data.seek(0)
@@ -96,8 +97,8 @@ async def speech_to_speech_translation(websocket: WebSocket):
             b_data.flush()  
     except WebSocketDisconnect:
         print("Cliente desconectado.")
-    # except Exception as e:
-    #     print("Error inesperado:", e)
+    except Exception as e:
+        print("Error inesperado:", e)
 
 
 # uvicorn main:app --reload
