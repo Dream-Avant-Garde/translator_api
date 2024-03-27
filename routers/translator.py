@@ -37,9 +37,8 @@ async def speech_to_speech_ranslation(audio_file: UploadFile = File(...)):
     data, sampling_rate = torchaudio.load(b_data)
     data = data.transpose(0,1)
     output = seamlees_m4t.s2st(settings.tgt_lang,data)
-    text, speech = output
     b_data = io.BytesIO()
-    torchaudio.save(b_data, output[1].audio_wavs[0][0].to(torch.float32).cpu(), speech.sample_rate, format='wav')
+    torchaudio.save(b_data, output[1].audio_wavs[0][0].to(torch.float32).cpu(), sampling_rate, format='wav')
 
 
     return StreamingResponse(return_streaming_audio(b_data.getvalue()), media_type='audio/wav')
