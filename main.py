@@ -1,6 +1,6 @@
 from dependencies import *
 
-from routers import translator, ex_translator, ws_translator
+# from routers import translator, ex_translator, ws_translator
 
 from fastapi import File, UploadFile
 from fastapi.responses import HTMLResponse, FileResponse, Response
@@ -8,9 +8,9 @@ import asyncio
 
 
 app = FastAPI()
-app.include_router(translator.router)
-app.include_router(ws_translator.router)
-app.include_router(ex_translator.router)
+# app.include_router(translator.router)
+# app.include_router(ws_translator.router)
+# app.include_router(ex_translator.router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -53,11 +53,11 @@ async def websocket_endpoint(websocket: WebSocket):
                 print("La conexión se ha agotado.")
                 break
             
-            with open('data.wav', 'wb') as f:
-                f.write(data)
-
-            for i in range(0, len(data), 1024):
-                await websocket.send_bytes(data[i:i + 1024])
+            # with open('data.wav', 'wb') as f:
+            #     f.write(data)
+            await websocket.send_bytes(data)
+            # for i in range(0, len(data), 1024):
+            #     await websocket.send_bytes(data[i:i + 1024])
             
 
     except WebSocketDisconnect:
@@ -65,12 +65,14 @@ async def websocket_endpoint(websocket: WebSocket):
     except Exception as e:
         print("Error inesperado:", e)
 
+ws_room = [] 
 
 @app.websocket("/S2ST/")
 async def speech_to_speech_translation(websocket: WebSocket):
     try:
         tgt_lang = 'eng'
         await websocket.accept()
+        ws_room.append(websocket)
         
         b_data = io.BytesIO()
 
@@ -95,8 +97,12 @@ async def speech_to_speech_translation(websocket: WebSocket):
             b_data.flush()  
 
             torchaudio.save(b_data, output[1].audio_wavs[0][0].to(torch.float32).cpu(), sampling_rate, format='wav')
+            
             b_data.seek(0)
-            await websocket.send_bytes(b_data.read())
+            for r in ws_room:
+                # if r != websocket:
+                #     await r.send_bytes(b_data.read())
+                await r.send_bytes(b_data.read())
 
             b_data.seek(0)
             b_data.truncate(0)
