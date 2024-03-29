@@ -100,9 +100,8 @@ async def speech_to_speech_translation(websocket: WebSocket):
             
             b_data.seek(0)
             for r in ws_room:
-                # if r != websocket:
-                #     await r.send_bytes(b_data.read())
-                await r.send_bytes(b_data.read())
+                if r != websocket:
+                    await r.send_bytes(b_data.read())
 
             b_data.seek(0)
             b_data.truncate(0)
