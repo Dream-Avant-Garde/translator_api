@@ -99,6 +99,7 @@ async def speech_to_speech_translation(websocket: WebSocket):
             torchaudio.save(b_data, output[1].audio_wavs[0][0].to(torch.float32).cpu(), sampling_rate, format='wav')
             
             b_data.seek(0)
+            print(len(ws_room))
             if len(ws_room) > 1:
                 for r in ws_room:
                     if r != websocket:
