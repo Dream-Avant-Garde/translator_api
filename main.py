@@ -104,7 +104,7 @@ async def speech_to_speech_translation(websocket: WebSocket):
                     if r != websocket:
                         await r.send_bytes(b_data.read())
             else:
-                websocket.send_bytes(b_data.read())
+                await websocket.send_bytes(b_data.read())
                 
 
             b_data.seek(0)
