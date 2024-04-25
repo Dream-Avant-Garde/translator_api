@@ -46,11 +46,12 @@ async def home():
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     try:
-        print(request.receive)
+        
         print(exc.args)
         print(exc.errors())
         print(exc.body)
-        print(request.body()[0:50])
+        print(await request.body()[0:50])
+        print(request.receive())
         
     except Exception as e:
         print('Error: request: ', e)
