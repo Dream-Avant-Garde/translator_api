@@ -2,6 +2,7 @@ from dependencies import *
 
 from routers import translator, ex_translator, ws_translator
 
+import logging
 from fastapi import File, UploadFile
 from fastapi.responses import HTMLResponse, FileResponse, Response
 import asyncio
@@ -11,6 +12,25 @@ app = FastAPI()
 app.include_router(translator.router)
 # app.include_router(ws_translator.router)
 # app.include_router(ex_translator.router)
+
+
+# Create a logger object
+logger = logging.getLogger('my-fastapi-app')
+
+# Set logging level to DEBUG
+logger.setLevel(logging.DEBUG)
+
+# Create a file handler to log to a file
+file_handler = logging.FileHandler('fastapi.log')
+
+# Create a formatter for log messages
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+# Add the formatter to the file handler
+file_handler.setFormatter(formatter)
+
+# Add the file handler to the logger
+logger.addHandler(file_handler)
 
 app.add_middleware(
     CORSMiddleware,
@@ -40,6 +60,11 @@ async def validate_ip(request: Request, call_next):
 async def home():
     return 'Welcome to Translator API'
 
+@app.before_event()
+async def log_request(request):
+    logger.info(f'Request received: {request.method} {request.url}')
+    logger.debug(f'Request headers: {request.headers}')
+    logger.debug(f'Request body: {await request.body()}')
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
