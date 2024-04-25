@@ -7,6 +7,7 @@ from fastapi.responses import HTMLResponse, FileResponse, Response
 from fastapi.exceptions import RequestValidationError
 from fastapi.encoders import jsonable_encoder
 import asyncio
+import json
 
 
 app = FastAPI()
@@ -49,12 +50,6 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content=jsonable_encoder({"detail": exc.errors(), "body": exc.body}),
     )
-
-from fastapi import FastAPI, Request
-import json
-
-app = FastAPI()
-
 
 @app.post("/json")
 async def receive_json(request: Request):
