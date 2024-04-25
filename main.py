@@ -45,7 +45,12 @@ async def home():
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    print(await request.body())
+    try:
+        print(request.keys())
+        print(await request.body())
+        
+    except Exception as e:
+        print(e)
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content=jsonable_encoder({"detail": exc.errors(), "body": exc.body}),
