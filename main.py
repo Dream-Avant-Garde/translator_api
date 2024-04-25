@@ -4,6 +4,8 @@ from routers import translator, ex_translator, ws_translator
 
 from fastapi import File, UploadFile
 from fastapi.responses import HTMLResponse, FileResponse, Response
+from fastapi.exceptions import RequestValidationError
+from fastapi.encoders import jsonable_encoder
 import asyncio
 
 
@@ -40,12 +42,12 @@ async def validate_ip(request: Request, call_next):
 async def home():
     return 'Welcome to Translator API'
 
-@app.exception_handler(Exception)
-async def unicorn_exception_handler(request: Request, exc):
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
     print(request)
     return JSONResponse(
-        status_code=418,
-        content={"message": f"Oops! {exc.name} did something. There goes a rainbow..."},
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content=jsonable_encoder({"detail": exc.errors(), "body": exc.body}),
     )
 
 @app.websocket("/ws")
