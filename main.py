@@ -50,6 +50,33 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         content=jsonable_encoder({"detail": exc.errors(), "body": exc.body}),
     )
 
+from fastapi import FastAPI, Request
+import json
+
+app = FastAPI()
+
+
+@app.post("/json")
+async def receive_json(request: Request):
+    # Read the JSON data from the request body
+    try:
+        json_data = await request.json()
+    except json.JSONDecodeError:
+        return JSONResponse({"error": "Invalid JSON data"}, status_code=400)
+
+    # Process the JSON data
+    print(f"Received JSON data: {json_data}")
+    # You can perform any processing or validation logic here based on the JSON data
+
+    # Prepare a response
+    response_data = {
+        "message": "JSON data received and processed successfully",
+        "data": json_data
+    }
+
+    return JSONResponse(response_data)
+
+
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     try:
