@@ -1,6 +1,6 @@
 from dependencies import *
 
-# from routers import translator, ex_translator, ws_translator
+from routers import translator, ex_translator, ws_translator
 
 from fastapi import File, UploadFile
 from fastapi.responses import HTMLResponse, FileResponse, Response
@@ -8,7 +8,7 @@ import asyncio
 
 
 app = FastAPI()
-# app.include_router(translator.router)
+app.include_router(translator.router)
 # app.include_router(ws_translator.router)
 # app.include_router(ex_translator.router)
 
