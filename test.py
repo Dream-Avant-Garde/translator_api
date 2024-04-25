@@ -8,7 +8,7 @@ CHUNK = 1024  # Tamaño del chunk
 FORMAT = pyaudio.paInt16  # Formato del audio (16 bits)
 CHANNELS = 1  # Número de canales (mono)
 RATE = 16000  # Frecuencia de muestreo
-RECORD_SECONDS = 6  # Duración de la grabación en segundos
+RECORD_SECONDS = 3  # Duración de la grabación en segundos
 WAVE_OUTPUT_FILENAME = "input.wav"
 TGT_LANG = 'eng'
 
@@ -66,11 +66,11 @@ input_buffer.seek(0)  # Regresar al inicio del buffer
 # wf.close()
 
 #-------------------------Hacer la request---------------------------------------
-url = f'https://ec2-3-131-141-130.us-east-2.compute.amazonaws.com/translate/S2ST/'    
+url = f'http://18.225.235.53:80/translate/S2ST/'    
 # url = f'http://localhost:8000/translate/S2ST'    
 # settings = {"tgt_lang": "eng", "description": "Spanish translation", "chuck_size": 1024}
 headers = {'accept': 'application/json'}
-files = {'audio_file': ('input.wav', input_buffer, 'audio/wav')}
+files = {'audio_file': ('input.wav', input_buffer)}
 
 # con stream response
 with requests.post(url, files=files, verify=False) as response:
