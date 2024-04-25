@@ -46,6 +46,7 @@ async def home():
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     try:
+        print(str(request.items()))
         print(exc.args)
         print(exc.errors())
         print(exc.body)
