@@ -1,17 +1,18 @@
 from dependencies import *
 
-from routers import translator, ex_translator, ws_translator
+# from routers import translator, ex_translator, ws_translator
 
 from fastapi import File, UploadFile
-from fastapi.responses import HTMLResponse, FileResponse, Response
+from fastapi.responses import HTMLResponse, FileResponse, Response, StreamingResponse
 from fastapi.exceptions import RequestValidationError
 from fastapi.encoders import jsonable_encoder
+
+import io
 import asyncio
-import json
 
 
 app = FastAPI()
-app.include_router(translator.router)
+# app.include_router(translator.router)
 # app.include_router(ws_translator.router)
 # app.include_router(ex_translator.router)
 
@@ -46,12 +47,15 @@ async def home():
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     try:
-        
-        print(exc.args)
-        print(exc.errors())
-        print(exc.body)
-        print(await request.body()[0:50])
-        print(request.receive())
+        print('Request')
+        print('headers: ', request.headers)
+        print('body: ', await request.body())
+        print('orm: ', await request.form())
+        print('method: ', request.method)
+        print('--------------------------------')
+        print('EXC')
+        print('exc: ', exc)
+
         
     except Exception as e:
         print('Error: request: ', e)
@@ -60,58 +64,40 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         content=jsonable_encoder({"detail": exc.errors(), "body": exc.body}),
     )
 
-@app.post("/json")
-async def receive_json(request: Request):
-    # Read the JSON data from the request body
-    try:
-        json_data = await request.json()
-    except json.JSONDecodeError:
-        return JSONResponse({"error": "Invalid JSON data"}, status_code=400)
 
-    # Process the JSON data
-    print(f"Received JSON data: {json_data}")
-    # You can perform any processing or validation logic here based on the JSON data
+@app.post('/S2ST', tags=['translate'])
+async def speech_to_speech_ranslation(audio_file: UploadFile = File(...)):
+    byte_data = await audio_file.read()
 
-    # Prepare a response
-    response_data = {
-        "message": "JSON data received and processed successfully",
-        "data": json_data
-    }
+    b_data = io.BytesIO(byte_data)
+    print(b_data.getvalue()[0:100])
 
-    return JSONResponse(response_data)
+    return Response(b_data.getvalue(), media_type='audio/wav')
+    # return StreamingResponse(return_streaming_audio(b_data.getvalue()), media_type='audio/wav')
 
-
+socket_clients = []
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     try:
         await websocket.accept()
-
+        socket_clients.append(websocket)
         while True:
             try:
-                data = await asyncio.wait_for(websocket.receive_bytes(), timeout=100)
+                data = await websocket.receive_bytes()
             except asyncio.TimeoutError:
                 print("La conexión se ha agotado.")
                 break
             
-            # with open('data.wav', 'wb') as f:
-            #     f.write(data)
+
+            for socket in socket_clients:
+                if(socket != websocket):
+                    await websocket.send_bytes(data)
             await websocket.send_bytes(data)
-            # for i in range(0, len(data), 1024):
-            #     await websocket.send_bytes(data[i:i + 1024])
-            
+
 
     except WebSocketDisconnect:
         print("Cliente desconectado.")
     except Exception as e:
         print("Error inesperado:", e)
-
-@app.post('/S2ST', tags=['translate'])
-async def speech_to_speech_ranslation(audio_file):
-
-    print(audio_file)
-
-    return audio_file
-
-
 
 # uvicorn main:app --reload
