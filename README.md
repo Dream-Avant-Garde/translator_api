@@ -1,4 +1,4 @@
-- pip install -r pip install -r .\requirements2.txt
+- pip install -r .\requirements2.txt
 - uvicorn main:app 
 
 - se lanza en: localhost:8000

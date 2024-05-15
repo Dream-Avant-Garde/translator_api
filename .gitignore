@@ -1,4 +1,5 @@
 venv/
+audios/
 .vscode
 .pt
 ssh_cloud9.txt

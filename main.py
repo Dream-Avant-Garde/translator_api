@@ -9,6 +9,7 @@ from fastapi.encoders import jsonable_encoder
 
 import io
 import asyncio
+import os
 
 
 app = FastAPI()
@@ -76,11 +77,14 @@ async def speech_to_speech_ranslation(audio_file: UploadFile = File(...)):
     # return StreamingResponse(return_streaming_audio(b_data.getvalue()), media_type='audio/wav')
 
 socket_clients = []
+i = 0
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
+    global i
     try:
         await websocket.accept()
         socket_clients.append(websocket)
+        
         while True:
             try:
                 data = await websocket.receive_bytes()
@@ -88,10 +92,13 @@ async def websocket_endpoint(websocket: WebSocket):
                 print("La conexión se ha agotado.")
                 break
             
-
-            for socket in socket_clients:
-                if(socket != websocket):
-                    await websocket.send_bytes(data)
+            if os.path.exists('audios/'):
+                with open(f'audios/{i}.wav', 'wb') as file:
+                    file.write(data)
+                    i += 1
+            else: os.mkdir('audios/')
+            
+            
             await websocket.send_bytes(data)
 
 
