@@ -112,7 +112,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
             
             print('sample rate: ', sampling_rate)
-            print('len data: ', data)
+            print('OUT: ', output[0])
 
             print('Respuesta enviada')
             print('\n----------------------------------------------------------------\n')
