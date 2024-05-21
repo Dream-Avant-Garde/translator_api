@@ -109,6 +109,10 @@ async def websocket_endpoint(websocket: WebSocket):
             b_data = io.BytesIO()
             torchaudio.save(b_data, output[1].audio_wavs[0][0].to(torch.float32).cpu(), sampling_rate, format='wav')
             
+            if os.path.exists('audios/'):
+                with open(f'audios/out{i}.wav', 'wb') as file:
+                    file.write(b_data.getvalue())
+
             print('Respuesta enviada')
             print('\n----------------------------------------------------------------\n')
             await websocket.send_bytes(b_data.getvalue())

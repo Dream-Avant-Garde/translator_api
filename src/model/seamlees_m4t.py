@@ -34,5 +34,6 @@ def s2st(tgt_lang:str, data:torch.Tensor):
       input=data,
       task_str="s2st",
       tgt_lang=tgt_lang,
+      sample_rate=48000,
   )
   return output
