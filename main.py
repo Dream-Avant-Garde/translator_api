@@ -103,15 +103,16 @@ async def websocket_endpoint(websocket: WebSocket):
             data = data.transpose(0,1)
             output = seamlees_m4t.s2st('eng',data)
             b_data = io.BytesIO()
-            torchaudio.save(b_data, output[1].audio_wavs[0][0].to(torch.float32).cpu(), sampling_rate, format='wav')
+            # torchaudio.save(b_data, output[1].audio_wavs[0][0].to(torch.float32).cpu(), sampling_rate, format='wav')
+            torchaudio.save(b_data, data, sampling_rate, format='wav')
             print('sample rate: ', sampling_rate)
             print('len data: ', data)
 
-            if os.path.exists('audios/'):
-                with open(f'audios/out{i-1}.wav', 'wb') as file:
-                    file.write(b_data.getvalue())
-                    i += 1
-            else: os.mkdir('audios/')
+            # if os.path.exists('audios/'):
+            #     with open(f'audios/out{i-1}.wav', 'wb') as file:
+            #         file.write(b_data.getvalue())
+            #         i += 1
+            # else: os.mkdir('audios/')
 
             print('Respuesta enviada')
             print('\n----------------------------------------------------------------\n')
