@@ -84,10 +84,13 @@ async def websocket_endpoint(websocket: WebSocket):
     try:
         await websocket.accept()
         socket_clients.append(websocket)
+
+        b_data = io.BytesIO()
         
         while True:
             try:
-                data = await websocket.receive_bytes()
+                bytes_data  = await websocket.receive_bytes()
+                b_data.write(bytes_data)
                 print('Entrada# ', i)
                 print('len data:', len(data))
                 print('byte data: ', data[0:44])
@@ -95,28 +98,31 @@ async def websocket_endpoint(websocket: WebSocket):
                 print("La conexión se ha agotado.")
                 break
 
-            b_data = io.BytesIO(data)
             b_data.seek(0)
+            data, sampling_rate = torchaudio.load(uri=b_data)
 
-            data, sampling_rate = torchaudio.load(b_data)
-            sampling_rate = 16000
             data = data.transpose(0,1)
             output = seamlees_m4t.s2st('eng',data)
-            b_data = io.BytesIO()
-            # torchaudio.save(b_data, output[1].audio_wavs[0][0].to(torch.float32).cpu(), sampling_rate, format='wav')
-            torchaudio.save(b_data, data, sampling_rate, format='wav')
+
+            b_data.seek(0)
+            b_data.truncate(0)
+            b_data.flush()  
+            
+            torchaudio.save(b_data, output[1].audio_wavs[0][0].to(torch.float32).cpu(), sampling_rate, format='wav')
+
+            
             print('sample rate: ', sampling_rate)
             print('len data: ', data)
 
-            # if os.path.exists('audios/'):
-            #     with open(f'audios/out{i-1}.wav', 'wb') as file:
-            #         file.write(b_data.getvalue())
-            #         i += 1
-            # else: os.mkdir('audios/')
-
             print('Respuesta enviada')
             print('\n----------------------------------------------------------------\n')
+            
+            b_data.seek(0)
             await websocket.send_bytes(b_data.getvalue())
+            
+            b_data.seek(0)
+            b_data.truncate(0)
+            b_data.flush()  
 
 
     except WebSocketDisconnect:
