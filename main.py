@@ -102,6 +102,7 @@ async def websocket_endpoint(websocket: WebSocket):
             else: os.mkdir('audios/')
 
             b_data = io.BytesIO(data)
+            b_data.seek(0)
 
             data, sampling_rate = torchaudio.load(b_data)
             sampling_rate = 16000
