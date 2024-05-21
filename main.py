@@ -92,8 +92,8 @@ async def websocket_endpoint(websocket: WebSocket):
                 bytes_data  = await websocket.receive_bytes()
                 b_data.write(bytes_data)
                 print('Entrada# ', i)
-                print('len data:', len(data))
-                print('byte data: ', data[0:44])
+                print('len data:', len(bytes_data))
+                print('byte data: ', bytes_data[0:44])
             except asyncio.TimeoutError:
                 print("La conexión se ha agotado.")
                 break
