@@ -104,6 +104,7 @@ async def websocket_endpoint(websocket: WebSocket):
             b_data = io.BytesIO(data)
 
             data, sampling_rate = torchaudio.load(b_data)
+            sampling_rate = 16000
             data = data.transpose(0,1)
             output = seamlees_m4t.s2st('eng',data)
             b_data = io.BytesIO()
