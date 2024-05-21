@@ -94,12 +94,6 @@ async def websocket_endpoint(websocket: WebSocket):
             except asyncio.TimeoutError:
                 print("La conexión se ha agotado.")
                 break
-            
-            if os.path.exists('audios/'):
-                with open(f'audios/{i}.wav', 'wb') as file:
-                    file.write(data)
-                    i += 1
-            else: os.mkdir('audios/')
 
             b_data = io.BytesIO(data)
             b_data.seek(0)
@@ -111,10 +105,13 @@ async def websocket_endpoint(websocket: WebSocket):
             b_data = io.BytesIO()
             torchaudio.save(b_data, output[1].audio_wavs[0][0].to(torch.float32).cpu(), sampling_rate, format='wav')
             print('sample rate: ', sampling_rate)
+            print('len data: ', len(b_data))
 
             if os.path.exists('audios/'):
                 with open(f'audios/out{i-1}.wav', 'wb') as file:
                     file.write(b_data.getvalue())
+                    i += 1
+            else: os.mkdir('audios/')
 
             print('Respuesta enviada')
             print('\n----------------------------------------------------------------\n')
