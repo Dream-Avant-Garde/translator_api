@@ -120,13 +120,13 @@ async def websocket_endpoint(websocket: WebSocket):
             b_data.seek(0)
             await websocket.send_bytes(b_data.getvalue())
 
-            if os.path.exists('/audios/'):
-                with open(f'/audios/{i}-in.wav', 'wb') as f:
+            if os.path.exists('audios/'):
+                with open(f'audios/{i}-in.wav', 'wb') as f:
                     f.write(bytes_data)
-                with open('/audios/{i}-out.wav', 'wb') as f:
+                with open('audios/{i}-out.wav', 'wb') as f:
                     f.write(b_data.getvalue())
             else:
-                os.mkdir('/audios/')
+                os.mkdir('audios/')
             
             b_data.seek(0)
             b_data.truncate(0)
