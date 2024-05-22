@@ -76,7 +76,7 @@ async def speech_to_speech_translation(websocket: WebSocket):
 
         while True:
             try:
-                bytes_data = await asyncio.wait_for(websocket.receive_bytes(), timeout=10)
+                bytes_data = await websocket.receive_bytes()
                 
                 b_data.write(bytes_data)
             except asyncio.TimeoutError:
