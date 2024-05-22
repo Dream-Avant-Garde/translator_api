@@ -29,7 +29,7 @@ translator = Translator(
     dtype=torch.float16,
 )
 
-def s2st(tgt_lang:str, data:torch.Tensor, samplerate=16000):
+def s2st(tgt_lang:str, data:torch.Tensor, samplerate):
   output = translator.predict(
       input=data,
       task_str="s2st",
