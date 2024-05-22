@@ -91,7 +91,7 @@ async def speech_to_speech_translation(websocket: WebSocket):
             print('output sample_rate:', output[1].sample_rate)
 
             out_audio = output[1]
-            out_audio = torchaudio.functional.resample(data, orig_freq=16000, new_freq=sampling_rate)
+            out_audio = torchaudio.functional.resample(out_audio, orig_freq=16000, new_freq=sampling_rate)
 
             b_data.seek(0)
             b_data.truncate(0)
