@@ -90,14 +90,14 @@ async def speech_to_speech_translation(websocket: WebSocket):
             output = seamlees_m4t.s2st(tgt_lang, data.transpose(0,1), samplerate=sampling_rate)
             print('output sample_rate:', output[1].sample_rate)
 
-
-            output[1] = torchaudio.functional.resample(data, orig_freq=16000, new_freq=sampling_rate)
+            out_audio = output[1]
+            out_audio = torchaudio.functional.resample(data, orig_freq=16000, new_freq=sampling_rate)
 
             b_data.seek(0)
             b_data.truncate(0)
             b_data.flush()  
 
-            torchaudio.save(b_data, output[1].audio_wavs[0][0].to(torch.float32).cpu(), sampling_rate, format='wav')
+            torchaudio.save(b_data, out_audio.audio_wavs[0][0].to(torch.float32).cpu(), sampling_rate, format='wav')
             b_data.seek(0)
             await websocket.send_bytes(b_data.read())
 
