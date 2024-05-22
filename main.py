@@ -68,84 +68,47 @@ async def websocket_endpoint(websocket: WebSocket):
 
 @app.websocket("/S2ST/")
 async def speech_to_speech_translation(websocket: WebSocket):
-    tgt_lang = 'eng'
-    await websocket.accept()
-    
-    b_data = io.BytesIO()
-
-    while True:
-        try:
-            bytes_data = await websocket.receive_bytes()
-            
-            b_data.write(bytes_data)
-        except asyncio.TimeoutError:
-            print("La conexión se ha agotado.")
-            break
-
-        b_data.seek(0)
-        data, sampling_rate = torchaudio.load(uri=b_data)
-        data = torchaudio.functional.resample(data, orig_freq=sampling_rate, new_freq=16000)
-
-        output = seamlees_m4t.s2st(tgt_lang, data.transpose(0,1), samplerate=sampling_rate)
-        print('output sample_rate:', output[1].sample_rate)
-
-        out_audio = output[1]
-        out_audio = torchaudio.functional.resample(out_audio, orig_freq=16000, new_freq=sampling_rate)
-
-        b_data.seek(0)
-        b_data.truncate(0)
-        b_data.flush()  
-
-        torchaudio.save(b_data, out_audio.audio_wavs[0][0].to(torch.float32).cpu(), sampling_rate, format='wav')
-        b_data.seek(0)
-        await websocket.send_bytes(b_data.read())
-
-        b_data.seek(0)
-        b_data.truncate(0)
-        b_data.flush()  
-        print('output: ', output[0])
-    # try:
-    #     tgt_lang = 'eng'
-    #     await websocket.accept()
+    try:
+        tgt_lang = 'eng'
+        await websocket.accept()
         
-    #     b_data = io.BytesIO()
+        b_data = io.BytesIO()
 
-    #     while True:
-    #         try:
-    #             bytes_data = await websocket.receive_bytes()
+        while True:
+            try:
+                bytes_data = await websocket.receive_bytes()
                 
-    #             b_data.write(bytes_data)
-    #         except asyncio.TimeoutError:
-    #             print("La conexión se ha agotado.")
-    #             break
+                b_data.write(bytes_data)
+            except asyncio.TimeoutError:
+                print("La conexión se ha agotado.")
+                break
 
-    #         b_data.seek(0)
-    #         data, sampling_rate = torchaudio.load(uri=b_data)
-    #         data = torchaudio.functional.resample(data, orig_freq=sampling_rate, new_freq=16000)
+            b_data.seek(0)
+            data, sampling_rate = torchaudio.load(uri=b_data)
+            data = torchaudio.functional.resample(data, orig_freq=sampling_rate, new_freq=16000)
 
-    #         output = seamlees_m4t.s2st(tgt_lang, data.transpose(0,1), samplerate=sampling_rate)
-    #         print('output sample_rate:', output[1].sample_rate)
+            output = seamlees_m4t.s2st(tgt_lang, data.transpose(0,1), samplerate=sampling_rate)
+            print('output sample_rate:', output[1].sample_rate)
 
-    #         out_audio = output[1]
-    #         out_audio = torchaudio.functional.resample(out_audio, orig_freq=16000, new_freq=sampling_rate)
+            out_audio = torchaudio.functional.resample(output[1].audio_wavs[0][0].to(torch.float32).cpu(), orig_freq=16000, new_freq=sampling_rate)
 
-    #         b_data.seek(0)
-    #         b_data.truncate(0)
-    #         b_data.flush()  
+            b_data.seek(0)
+            b_data.truncate(0)
+            b_data.flush()  
 
-    #         torchaudio.save(b_data, out_audio.audio_wavs[0][0].to(torch.float32).cpu(), sampling_rate, format='wav')
-    #         b_data.seek(0)
-    #         await websocket.send_bytes(b_data.read())
+            torchaudio.save(b_data, out_audio, sampling_rate, format='wav')
+            b_data.seek(0)
+            await websocket.send_bytes(b_data.read())
 
-    #         b_data.seek(0)
-    #         b_data.truncate(0)
-    #         b_data.flush()  
-    #         print('output: ', output[0])
+            b_data.seek(0)
+            b_data.truncate(0)
+            b_data.flush()  
+            print('output: ', output[0])
 
-    # except WebSocketDisconnect:
-    #     print("Cliente desconectado.")
-    # except Exception as e:
-    #     print("Error inesperado:", e)
+    except WebSocketDisconnect:
+        print("Cliente desconectado.")
+    except Exception as e:
+        print("Error inesperado:", e)
 
 
 # uvicorn main:app --reload
