@@ -100,7 +100,7 @@ async def speech_to_speech_translation(websocket: WebSocket):
             b_data.flush()  
 
             # load audio on buffer
-            torchaudio.save(b_data, out_audio, sampling_rate, format='wav')
+            torchaudio.save(uri=b_data, src=out_audio, sample_rate=sampling_rate, format='wav', buffer_size=1024, bits_per_sample=32)
 
             # go to index byte 0
             b_data.seek(0)
