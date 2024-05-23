@@ -84,26 +84,34 @@ async def speech_to_speech_translation(websocket: WebSocket):
                 break
 
             b_data.seek(0)
+
+            # preprocess data
             data, sampling_rate = torchaudio.load(uri=b_data)
             data = torchaudio.functional.resample(data, orig_freq=sampling_rate, new_freq=16000)
-            print('input sample_rate: ', sampling_rate)
+
+            # make inference
             output = seamlees_m4t.s2st(tgt_lang, data.transpose(0,1))
-            print('output sample_rate:', output[1].sample_rate)
-
             out_audio = torchaudio.functional.resample(output[1].audio_wavs[0][0].to(torch.float32).cpu(), orig_freq=16000, new_freq=sampling_rate)
+            print('Text output: ', output[0])
 
+            # restart buffer
             b_data.seek(0)
             b_data.truncate(0)
             b_data.flush()  
 
+            # load audio on buffer
             torchaudio.save(b_data, out_audio, sampling_rate, format='wav')
+
+            # go to index byte 0
             b_data.seek(0)
+
+            # return bytes audio
             await websocket.send_bytes(b_data.read())
-            print('len output', len(b_data.getvalue()))
+
+            # restart buffer
             b_data.seek(0)
             b_data.truncate(0)
             b_data.flush()  
-            print('output: ', output[0])
 
     except WebSocketDisconnect:
         print("Cliente desconectado.")
