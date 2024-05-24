@@ -77,7 +77,7 @@ async def speech_to_speech_translation(websocket: WebSocket):
     while True:
         json_tgt_lang = await websocket.receive_json()
         print('Target lang: ', tgt_lang)
-        if json_tgt_lang[tgt_lang] in ('eng', 'spa', 'fra', 'deu', 'ita', 'hin', 'cmn'):
+        if json_tgt_lang['value'] in ('eng', 'spa', 'fra', 'deu', 'ita', 'hin', 'cmn'):
             break
         
     
