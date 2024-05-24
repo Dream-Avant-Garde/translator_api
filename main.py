@@ -79,6 +79,7 @@ async def speech_to_speech_translation(websocket: WebSocket):
             if tgt_lang in ('eng', 'spa', 'fra', 'deu', 'ita', 'hin', 'cmn'):
                 break
 
+        print('Target lang: ', tgt_lang)
         while True:
             try:
                 bytes_data = await websocket.receive_bytes()
