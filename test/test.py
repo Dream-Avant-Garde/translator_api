@@ -66,7 +66,7 @@ input_buffer.seek(0)  # Regresar al inicio del buffer
 # wf.close()
 
 #-------------------------Hacer la request---------------------------------------
-url = f'http://18.225.235.53:80/translate/S2ST/'    
+url = f'http://54.233.162.242:80/translate/S2ST/'    
 # url = f'http://localhost:8000/translate/S2ST'    
 # settings = {"tgt_lang": "eng", "description": "Spanish translation", "chuck_size": 1024}
 headers = {'accept': 'application/json'}
