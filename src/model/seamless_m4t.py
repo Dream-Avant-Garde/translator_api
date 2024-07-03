@@ -20,22 +20,19 @@ from seamless_communication.streaming.dataloaders.s2tt import SileroVADSilenceRe
 with open ('config/seamless_m4t.yml', 'r') as seamless_m4t_ymlfile:
     seamless_config = yaml.safe_load(seamless_m4t_ymlfile)
 
-def translator_config():
-    model_name = seamless_config['model']
-    vocoder_name = seamless_config['vocoder'][0] if model_name == "seamlessM4T_v2_large" else seamless_config['vocoder'][1]
-    device = seamless_config['device']
+model_name = seamless_config['model']
+vocoder_name = seamless_config['vocoder'][0] if model_name == "seamlessM4T_v2_large" else seamless_config['vocoder'][1]
+device = seamless_config['device']
     
-    translator = Translator(
-        model_name,
-        vocoder_name,
-        device=torch.device(device),
-        # device=torch.device("cpu"),
-        dtype=torch.float16,
-    )
-    return translator
+translator = Translator(
+    model_name,
+    vocoder_name,
+    device=torch.device(device),
+    # device=torch.device("cpu"),
+    dtype=torch.float16,
+)
 
 def s2st(tgt_lang:str, data:torch.Tensor):
-    translator = translator_config()
     output = translator.predict(
         input=data,
         task_str=seamless_config['task'],
