@@ -23,11 +23,12 @@ with open ('config/seamless_m4t.yml', 'r') as seamless_m4t_ymlfile:
 def translator_config():
     model_name = seamless_config['model']
     vocoder_name = seamless_config['vocoder'][0] if model_name == "seamlessM4T_v2_large" else seamless_config['vocoder'][1]
-
+    device = seamless_config['device']
+    
     translator = Translator(
         model_name,
         vocoder_name,
-        device=torch.device("cuda:0"),
+        device=torch.device(device),
         # device=torch.device("cpu"),
         dtype=torch.float16,
     )

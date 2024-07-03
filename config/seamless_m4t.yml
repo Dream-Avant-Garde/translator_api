@@ -7,3 +7,5 @@ vocoder:
   - vocoder_36langs # 1
 
 task: s2st 
+
+device: cuda:0 # gpu
