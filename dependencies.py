@@ -13,7 +13,7 @@ import uvicorn
 import torch
 import torchaudio
 import io
-from src.model import seamlees_m4t 
+from src.model import seamless_m4t 
 
 ###########################Local#####################################
     

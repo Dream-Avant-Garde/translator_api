@@ -8,7 +8,7 @@ import wave
 
 from src.func import return_streaming_audio
 from .models import TranslateSettings
-from src.model import seamlees_m4t 
+from src.model import seamless_m4t 
 
 router = APIRouter(prefix='/translate')
 
@@ -31,7 +31,7 @@ async def speech_to_speech_translation(audio_file: UploadFile = File(...)):
 
     data, sampling_rate = torchaudio.load(b_data)
     data = data.transpose(0, 1)
-    output = seamlees_m4t.s2st(settings.tgt_lang, data)
+    output = seamless_m4t.s2st(settings.tgt_lang, data)
     b_data = io.BytesIO()
     torchaudio.save(b_data, output[1].audio_wavs[0][0].to(torch.float32).cpu(), sampling_rate, format='wav')
 
@@ -51,7 +51,7 @@ async def speech_to_speech_translation(websocket: WebSocket, tgt_lang: str):
                 data, sampling_rate = torchaudio.load(b_data)
                 data = torchaudio.functional.resample(data, orig_freq=sampling_rate, new_freq=16000)
 
-                output = seamlees_m4t.s2st(tgt_lang, data.transpose(0, 1))
+                output = seamless_m4t.s2st(tgt_lang, data.transpose(0, 1))
                 out_audio = torchaudio.functional.resample(output[1].audio_wavs[0][0].to(torch.float32).cpu(), orig_freq=16000, new_freq=sampling_rate)
 
                 b_data.seek(0)

@@ -1,0 +1,9 @@
+# seamless m4t config
+
+model: seamlessM4T_v2_large # model name
+
+vocoder:
+  - vocoder_v2 # 0
+  - vocoder_36langs # 1
+
+task: s2st 
