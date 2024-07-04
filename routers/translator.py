@@ -46,8 +46,11 @@ async def speech_to_speech_translation(websocket: WebSocket):
         tgt_lang = 'eng'
         await websocket.accept()
 
-        settings = await websocket.receive_json()
-        print('settings: ', settings)
+        while True:
+            settings = await websocket.receive_json()
+            print('settings: ', settings)
+            if settings['tgt_lang'] == 'eng':
+                break
         
         b_data = io.BytesIO()
             
