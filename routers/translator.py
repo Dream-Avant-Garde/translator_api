@@ -43,11 +43,11 @@ async def speech_to_speech_translation(audio_file: UploadFile = File(...)):
 async def speech_to_speech_translation(websocket: WebSocket):
     try:
 
-        settings = await websocket.receive_json()
-        print('settings: ', settings)
-
         tgt_lang = 'eng'
         await websocket.accept()
+
+        settings = await websocket.receive_json()
+        print('settings: ', settings)
         
         b_data = io.BytesIO()
             
