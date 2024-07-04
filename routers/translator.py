@@ -10,6 +10,12 @@ from config.config import translator_config
 from src.func import return_streaming_audio
 from .models import TranslateSettings
 from src.model import seamless_m4t 
+from enum import Enum
+
+class Tgt_Languaje(Enum):
+    spa = "spa"
+    eng = "eng"
+    fra = "fr"
 
 
 router = APIRouter(prefix='/translate')
@@ -48,10 +54,17 @@ async def speech_to_speech_translation(websocket: WebSocket):
 
         while True:
             settings = await websocket.receive_json()
-            print('settings: ', settings)
-            if settings['tgt_lang'] == 'eng':
+            print('Settings received:', settings)
+            
+            tgt_lang = settings.get('tgt_lang', 'eng')  # Default to 'eng' if not provided or invalid
+            if tgt_lang not in Tgt_Languaje.__members__:
+                await websocket.send_json({'error': 'Invalid target language'})
+                continue
+            else: 
                 await websocket.send_json({'status': 'correct connection'})
                 break
+
+            
         
         b_data = io.BytesIO()
             

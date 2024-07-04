@@ -9,9 +9,9 @@ import contextlib
 from enum import Enum
 
 class Tgt_Languaje(Enum):
-    spa = 'spa'
-    eng = 'eng'
-    fra = 'fr'
+    spa = "spa"
+    eng = "eng"
+    fra = "fr"
 
 #----------------------------Parámetros de la grabación------------------------------------
 CHUNK = 1024  # Tamaño del chunk
