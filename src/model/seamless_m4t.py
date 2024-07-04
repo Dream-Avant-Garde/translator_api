@@ -8,7 +8,7 @@ import soundfile
 import torchaudio
 import torch
 import librosa
-import yaml
+from config.config import seamless_config
 
 from collections import defaultdict
 from pathlib import Path
@@ -17,8 +17,6 @@ from pydub import AudioSegment
 from seamless_communication.inference import Translator
 from seamless_communication.streaming.dataloaders.s2tt import SileroVADSilenceRemover
 
-with open ('config/seamless_m4t.yml', 'r') as seamless_m4t_ymlfile:
-    seamless_config = yaml.safe_load(seamless_m4t_ymlfile)
 
 model_name = seamless_config['model']
 vocoder_name = seamless_config['vocoder'][0] if model_name == "seamlessM4T_v2_large" else seamless_config['vocoder'][1]

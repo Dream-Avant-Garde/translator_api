@@ -5,18 +5,20 @@ import asyncio
 import torch
 import io
 import wave
+from config.config import translator_config
 
 from src.func import return_streaming_audio
 from .models import TranslateSettings
 from src.model import seamless_m4t 
 
+
 router = APIRouter(prefix='/translate')
 
 def get_default_settings():
     return TranslateSettings(
-        tgt_lang='eng',
-        description='default',
-        chuck_size=1024
+        tgt_lang=translator_config['tgt_lang'],
+        description=translator_config['description'],
+        chuck_size=translator_config['chucksize']
     )
 
 @router.get('/', tags=['translate'])

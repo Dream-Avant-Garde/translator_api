@@ -1,0 +1,7 @@
+# translation config 
+
+tgt_lang: eng # output language [eng, spa, por]
+
+description: default
+
+chuck_size: 1024

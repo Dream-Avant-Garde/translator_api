@@ -5,6 +5,6 @@ audios/
 .wav
 translator_keys.pem
 
-__pycache__/*
+__pycache__
 *.pyc
 
