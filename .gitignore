@@ -2,10 +2,9 @@ venv/
 audios/
 .vscode
 .pt
-ssh_cloud9.txt
 .wav
 translator_keys.pem
 
-__pycache__/*
+__pycache__
 *.pyc
 

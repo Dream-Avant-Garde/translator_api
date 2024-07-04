@@ -1,45 +1,41 @@
-from fastapi import APIRouter, Request, File, UploadFile, WebSocket, WebSocketDisconnect, Query, Depends
+from fastapi import APIRouter, UploadFile, File, WebSocket, WebSocketDisconnect
 from fastapi.responses import StreamingResponse
-
-from typing import Optional
 import torchaudio
 import asyncio
 import torch
 import io
 import wave
-# local
+from config.config import translator_config
+
 from src.func import return_streaming_audio
 from .models import TranslateSettings
-from src.model import seamlees_m4t 
+from src.model import seamless_m4t 
+
+
+router = APIRouter(prefix='/translate')
 
 def get_default_settings():
     return TranslateSettings(
-        tgt_lang='eng',
-        description='default',
-        chuck_size=1024
+        tgt_lang=translator_config['tgt_lang'],
+        description=translator_config['description'],
+        chuck_size=translator_config['chucksize']
     )
 
-router = APIRouter(
-    prefix='/translate'
-)
-
 @router.get('/', tags=['translate'])
-async def traslate():
+async def translate():
     return 'test'
 
 @router.post('/S2ST', tags=['translate'])
-async def speech_to_speech_ranslation(audio_file: UploadFile = File(...)):
+async def speech_to_speech_translation(audio_file: UploadFile = File(...)):
     byte_data = await audio_file.read()
-    print('entra')
     b_data = io.BytesIO(byte_data)
     settings = get_default_settings()
 
     data, sampling_rate = torchaudio.load(b_data)
-    data = data.transpose(0,1)
-    output = seamlees_m4t.s2st(settings.tgt_lang,data)
+    data = data.transpose(0, 1)
+    output = seamless_m4t.s2st(settings.tgt_lang, data)
     b_data = io.BytesIO()
     torchaudio.save(b_data, output[1].audio_wavs[0][0].to(torch.float32).cpu(), sampling_rate, format='wav')
-
 
     return StreamingResponse(return_streaming_audio(b_data.getvalue()), media_type='audio/wav')
 
@@ -68,7 +64,7 @@ async def speech_to_speech_translation(websocket: WebSocket):
             data = torchaudio.functional.resample(data, orig_freq=sampling_rate, new_freq=16000)
 
             # make inference
-            output = seamlees_m4t.s2st(tgt_lang, data.transpose(0,1))
+            output = seamless_m4t.s2st(tgt_lang, data.transpose(0,1))
             out_audio = torchaudio.functional.resample(output[1].audio_wavs[0][0].to(torch.float32).cpu(), orig_freq=16000, new_freq=sampling_rate)
             print('Text output: ', output[0])
 

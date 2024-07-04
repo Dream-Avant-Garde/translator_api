@@ -8,6 +8,7 @@ import soundfile
 import torchaudio
 import torch
 import librosa
+from config.config import seamless_config
 
 from collections import defaultdict
 from pathlib import Path
@@ -16,23 +17,23 @@ from pydub import AudioSegment
 from seamless_communication.inference import Translator
 from seamless_communication.streaming.dataloaders.s2tt import SileroVADSilenceRemover
 
-text_example = 'El examen y testimonio de los expertos permitieron a la comisión concluir que cinco disparos pueden haber sido disparados.'
 
-model_name = "seamlessM4T_v2_large"
-vocoder_name = "vocoder_v2" if model_name == "seamlessM4T_v2_large" else "vocoder_36langs"
-
+model_name = seamless_config['model']
+vocoder_name = seamless_config['vocoder'][0] if model_name == "seamlessM4T_v2_large" else seamless_config['vocoder'][1]
+device = seamless_config['device']
+    
 translator = Translator(
     model_name,
     vocoder_name,
-    device=torch.device("cuda:0"),
+    device=torch.device(device),
     # device=torch.device("cpu"),
     dtype=torch.float16,
 )
 
 def s2st(tgt_lang:str, data:torch.Tensor):
-  output = translator.predict(
-      input=data,
-      task_str="s2st",
-      tgt_lang=tgt_lang,
-  )
-  return output
+    output = translator.predict(
+        input=data,
+        task_str=seamless_config['task'],
+        tgt_lang=tgt_lang,
+    )
+    return output
