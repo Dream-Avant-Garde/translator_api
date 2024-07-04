@@ -57,7 +57,7 @@ async def connect_and_chat():
     ws = await websockets.connect("wss://54.233.162.242:80/translate/ws/S2ST/", ssl=False)
     try:
         # send settings
-        settings = json.dumps({"tgt_lang": Tgt_Languaje.eng})
+        settings = json.dumps({"tgt_lang": Tgt_Languaje.eng.value})
         await ws.send(str(settings))
         response = await ws.recv()
 
