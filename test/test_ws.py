@@ -10,7 +10,7 @@ FORMAT = pyaudio.paInt16  # Formato del audio (16 bits)
 CHANNELS = 1  # Número de canales (mono)
 RATE = 16000  # Frecuencia de muestreo
 RECORD_SECONDS = 6  # Duración de la grabación en segundos
-WAVE_OUTPUT_FILENAME = "input.wav"
+WAVE_OUTPUT_FILENAME = "test/in_audios/testaudio48.wav"
 
 # Inicializar PyAudio
 p = pyaudio.PyAudio()

@@ -42,6 +42,10 @@ async def speech_to_speech_translation(audio_file: UploadFile = File(...)):
 @router.websocket("/ws/S2ST/", name='translate')
 async def speech_to_speech_translation(websocket: WebSocket):
     try:
+
+        settings = await websocket.receive_json()
+        print('settings: ', settings)
+
         tgt_lang = 'eng'
         await websocket.accept()
         
