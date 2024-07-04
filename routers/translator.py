@@ -49,7 +49,6 @@ async def speech_to_speech_translation(audio_file: UploadFile = File(...)):
 async def speech_to_speech_translation(websocket: WebSocket):
     try:
 
-        tgt_lang = 'eng'
         await websocket.accept()
 
         while True:
