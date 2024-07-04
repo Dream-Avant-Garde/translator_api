@@ -43,46 +43,55 @@ async def speech_to_speech_ranslation(audio_file: UploadFile = File(...)):
 
     return StreamingResponse(return_streaming_audio(b_data.getvalue()), media_type='audio/wav')
 
-@router.websocket("/ws/S2ST/{tgt_lang}", name='translate')
-async def speech_to_speech_translation(websocket: WebSocket, tgt_lang:str):
+@router.websocket("/ws/S2ST/", name='translate')
+async def speech_to_speech_translation(websocket: WebSocket):
     try:
+        tgt_lang = 'eng'
         await websocket.accept()
+        
         b_data = io.BytesIO()
-
+            
+        
         while True:
             try:
-                data = await asyncio.wait_for(websocket.receive_bytes(), timeout=10)
+                bytes_data = await websocket.receive_bytes()
                 
+                b_data.write(bytes_data)
             except asyncio.TimeoutError:
                 print("La conexión se ha agotado.")
                 break
-            for i in range(0, len(data), 1024):
-                wf = wave.open(b_data, 'wb')
-                wf.setnchannels(1)
-                wf.setsampwidth(4)
-                wf.setframerate(16000)
-                wf.writeframes(data[i:i + 1024])
-                wf.close()
-                b_data.seek(0)
-                
-                data, sampling_rate = torchaudio.load(b_data)
-                data = data.transpose(0,1)
-                output = seamlees_m4t.s2st(tgt_lang,data)
-                text, speech = output
-                b_data.seek(0)
-                b_data.truncate(0)
-                b_data.flush()
 
-                torchaudio.save(b_data, output[1].audio_wavs[0][0].to(torch.float32).cpu(), speech.sample_rate, format='wav')
-                
-                b_data.seek(44)
-                await websocket.send_bytes(b_data.read())
+            b_data.seek(0)
 
-                b_data.seek(0)
-                b_data.truncate(0)
-                b_data.flush()
+            # preprocess data
+            data, sampling_rate = torchaudio.load(uri=b_data)
+            data = torchaudio.functional.resample(data, orig_freq=sampling_rate, new_freq=16000)
+
+            # make inference
+            output = seamlees_m4t.s2st(tgt_lang, data.transpose(0,1))
+            out_audio = torchaudio.functional.resample(output[1].audio_wavs[0][0].to(torch.float32).cpu(), orig_freq=16000, new_freq=sampling_rate)
+            print('Text output: ', output[0])
+
+            # restart buffer
+            b_data.seek(0)
+            b_data.truncate(0)
+            b_data.flush()  
+
+            # load audio on buffer
+            torchaudio.save(uri=b_data, src=out_audio, sample_rate=sampling_rate, format='wav', buffer_size=1024, bits_per_sample=32)
+
+            # go to index byte 0
+            b_data.seek(0)
+
+            # return bytes audio
+            await websocket.send_bytes(b_data.read())
+
+            # restart buffer
+            b_data.seek(0)
+            b_data.truncate(0)
+            b_data.flush()  
+
     except WebSocketDisconnect:
         print("Cliente desconectado.")
     except Exception as e:
         print("Error inesperado:", e)
-
