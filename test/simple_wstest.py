@@ -58,6 +58,7 @@ async def connect_and_chat():
         # send settings
         settings = {"tgt_lang": Tgt_Languaje.eng}
         await ws.send(str(settings))
+        response = await ws.recv()
 
         t1 = time.time()
         print('se envian los datos al server')
