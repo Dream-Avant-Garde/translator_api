@@ -7,4 +7,4 @@ translator_keys.pem
 
 __pycache__
 *.pyc
-
+env
