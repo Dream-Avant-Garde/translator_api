@@ -45,33 +45,23 @@ async def speech_to_speech_translation(audio_file: UploadFile = File(...)):
 
     return StreamingResponse(return_streaming_audio(b_data.getvalue()), media_type='audio/wav')
 
+i = 0
 @router.websocket("/ws/S2ST/", name='translate')
 async def speech_to_speech_translation(websocket: WebSocket):
     try:
 
         await websocket.accept()
-
-        while True:
-            settings = await websocket.receive_json()
-            print('Settings received:', settings)
-            
-            tgt_lang = settings.get('tgt_lang', 'eng')  # Default to 'eng' if not provided or invalid
-            if tgt_lang not in Tgt_Languaje.__members__:
-                await websocket.send_json({'error': 'Invalid target language'})
-                continue
-            else: 
-                await websocket.send_json({'status': 'correct connection'})
-                break
-
-            
         
         b_data = io.BytesIO()
-            
+        tgt_lang = 'eng'
         
         while True:
             try:
                 bytes_data = await websocket.receive_bytes()
                 
+                with open(f'/home/ubuntu/translator_api/audios/{i}-input_audio.wav', 'wb') as file:
+                    file.write(bytes_data)
+
                 b_data.write(bytes_data)
             except asyncio.TimeoutError:
                 print("La conexión se ha agotado.")
@@ -81,11 +71,12 @@ async def speech_to_speech_translation(websocket: WebSocket):
 
             # preprocess data
             data, sampling_rate = torchaudio.load(uri=b_data)
-            data = torchaudio.functional.resample(data, orig_freq=sampling_rate, new_freq=16000)
+            # data = torchaudio.functional.resample(data, orig_freq=sampling_rate, new_freq=16000)
 
             # make inference
             output = seamless_m4t.s2st(tgt_lang, data.transpose(0,1))
-            out_audio = torchaudio.functional.resample(output[1].audio_wavs[0][0].to(torch.float32).cpu(), orig_freq=16000, new_freq=sampling_rate)
+            out_audio = output[1].audio_wavs[0][0].to(torch.float32).cpu()
+            # out_audio = torchaudio.functional.resample(output[1].audio_wavs[0][0].to(torch.float32).cpu(), orig_freq=16000, new_freq=sampling_rate)
             print('Text output: ', output[0])
 
             # restart buffer
