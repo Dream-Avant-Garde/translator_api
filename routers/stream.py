@@ -9,7 +9,7 @@ import torch
 import torchaudio
 
 
-router = APIRouter(prefix='/translate')
+router = APIRouter(prefix='/stream')
 
 
 print("building system from dir")
@@ -69,21 +69,26 @@ async def speech_to_speech_translation(websocket: WebSocket):
                 output_segments = OutputSegments(system.pushpop(input_segment, system_states))
 
                 if not output_segments.is_empty:
+
                     for segment in output_segments.segments:
                         if isinstance(segment, SpeechSegment):
+                            # restart buffer
+                            b_data.seek(0)
+                            b_data.truncate(0)
+                            b_data.flush()  
+
                             audio_tensor = torch.tensor(segment.content, dtype=torch.float32).unsqueeze(0)
-                            torchaudio.save(f"/content/output/{i}output.wav", audio_tensor, 16000)
-                            websocket.send_bytes()
+                            torchaudio.save(b_data, audio_tensor, 16000)
+                            websocket.send_bytes(b_data.read())
                         elif isinstance(segment, TextSegment):
                             print(segment.content)
+
                 if output_segments.finished:
                     print("End of VAD segment")
                     reset_states(system, system_states)
                 if input_segment.finished:
                     assert output_segments.finished
                     break
-            
-            
 
     except WebSocketDisconnect:
         print("Cliente desconectado.")
