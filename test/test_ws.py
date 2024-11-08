@@ -3,13 +3,14 @@ import websockets
 import pyaudio
 import wave
 import io
+import numpy as np
 
 #----------------------------Parámetros de la grabación------------------------------------
 CHUNK = 1024  # Tamaño del chunk
-FORMAT = pyaudio.paInt16  # Formato del audio (16 bits)
+FORMAT = pyaudio.paInt32  # Formato del audio (16 bits)
 CHANNELS = 1  # Número de canales (mono)
 RATE = 16000  # Frecuencia de muestreo
-RECORD_SECONDS = 6  # Duración de la grabación en segundos
+RECORD_SECONDS = 4  # Duración de la grabación en segundos
 WAVE_OUTPUT_FILENAME = "test/in_audios/testaudio48.wav"
 
 # Inicializar PyAudio
@@ -19,15 +20,16 @@ p = pyaudio.PyAudio()
 stream_in = p.open(format=FORMAT,
                 channels=CHANNELS,
                 rate=RATE,
-                input=True,
-                frames_per_buffer=CHUNK)
+                input=True)
 
-stream_out = p.open(format=FORMAT,
-                channels=CHANNELS,
-                rate=RATE,
-                output=True,
-                frames_per_buffer=CHUNK)
+stream_out = p.open(
+    format=pyaudio.paInt32,          # Formato de 32 bits en flotante
+    channels=1,                        # Mono
+    rate=16000,                  # Frecuencia de muestreo (16000 Hz)
+    output=True
+)
 
+input('Enter para empezar...')
 print("* Grabando...")
 
 frames = []
@@ -54,71 +56,23 @@ wf.setframerate(RATE)
 wf.writeframes(b''.join(frames))
 wf.close()
 
-input_buffer.seek(0)  # Regresar al inicio del buffer
-
-
-# async def connect_and_chat():
-#     async with websockets.connect("ws://localhost:8000/ws") as websocket:
-#         message = open("C:/Users/alanh/Downloads/librosa1.wav", 'rb').read()
-#         await websocket.send(message)
-
-#         i = 0
-#         try:
-#             while True:
-#                 response = await websocket.recv()
-#                 i += 1
-
-#                 if len(response) == 1024:
-#                     print(f'response{i}:', len(response))
-#                     print('--------------------------------')
-#                 else:
-#                     print(f'response{i}:', len(response))
-#                     break 
-
-#             await websocket.close() 
-#         except asyncio.TimeoutError:
-#             print("Connection timed out.")
-#         except websockets.ConnectionClosed as e:
-#             print("Connection closed:", e)
-#         except Exception as e:  # Catch other potential exceptions
-#             print("Error:", e)
-
-# asyncio.run(connect_and_chat())
+input_buffer.seek(0)
 
 
 async def connect_and_chat():
-    # ws = await websockets.connect("wss://3.144.138.81:80/ws/", ssl=False    )
-    ws = await websockets.connect("wss://54.233.162.242:80/translate/S2ST/", ssl=False)
+    ws = await websockets.connect("wss://52.14.194.163:80/translate/ws/S2ST/", ssl=False)
     try:
-        # ... su código usando `ws` ...
-
-        # Ejemplo: Enviando datos
-        # with open("C:/Users/alanh/Downloads/librosa1.wav", 'rb') as audio_file:
-        #     await ws.send(audio_file.read())
         await ws.send(input_buffer.read())
 
-        # Ejemplo: Recibiendo datos
-        i = 0
-        try:
-            while True:
-                response = await ws.recv()
-                i += 1
+        response = await ws.recv()
+        with open('test/out_audios/out_audio.wav', 'wb') as file:
+            file.write(response)
+        response = response[44:]
 
-                stream_out.write(response)
-                if len(response) == 1024:
-                    print(f'response{i}:', len(response))
-                    print('--------------------------------')
-                else:
-                    print(f'response{i}:', len(response))
-                    break 
-            await ws.close() 
-        except asyncio.TimeoutError:
-            print("Connection timed out.")
-        except websockets.ConnectionClosed as e:
-            print("Connection closed:", e)
-        except Exception as e:  # Catch other potential exceptions
-            print("Error:", e)
-        # ... otras operaciones usando `ws` ...
+        stream_out.write(response)
+
+        await ws.close()
+        
     except Exception as e:
         print("Error:", e)
 
