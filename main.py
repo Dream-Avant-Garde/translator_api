@@ -2,14 +2,15 @@ from fastapi import FastAPI, Request, WebSocketDisconnect
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from dependencies import *
-from routers import translator, ex_translator, ws_translator
+from routers import translator, ex_translator, ws_translator, stream
 
 app = FastAPI()
 
 # Incluir los routers
-app.include_router(translator.router)
-app.include_router(ws_translator.router)
-app.include_router(ex_translator.router)
+# app.include_router(translator.router)
+# app.include_router(ws_translator.router)
+# app.include_router(ex_translator.router)
+app.include_router(stream.router)
 
 # Middleware para CORS
 app.add_middleware(
