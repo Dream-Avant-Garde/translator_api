@@ -4,13 +4,13 @@ import io
 
 async def send_audio_and_receive_translation():
     # Dirección del servidor WebSocket
-    uri = "ws://52.14.194.163:8000/stream/ws/S2ST/"
+    uri = "ws://52.14.194.163:80/stream/ws/S2ST/"
 
     async with websockets.connect(uri) as websocket:
         print("Conexión establecida con el WebSocket")
 
         # Abre el archivo de audio y lee su contenido en bytes
-        with open("input_audio.wav", "rb") as audio_file:
+        with open("test/in_audios/input.wav", "rb") as audio_file:
             audio_data = audio_file.read()
 
         # Envía el audio en fragmentos al servidor

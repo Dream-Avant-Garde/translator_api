@@ -4,7 +4,7 @@ from seamless_communication.streaming.agents.seamless_streaming_s2st import (
 import asyncio
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 import io
-from src.audio import *
+from src.audio.audio import *
 import torch
 import torchaudio
 
