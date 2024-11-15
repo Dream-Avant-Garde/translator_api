@@ -78,7 +78,7 @@ async def speech_to_speech_translation(websocket: WebSocket):
                         b_data.flush()  
 
                         audio_tensor = torch.tensor(segment.content, dtype=torch.float32).unsqueeze(0)
-                        torchaudio.save(b_data, audio_tensor, 16000)
+                        torchaudio.save(b_data, audio_tensor, 16000, format="wav")
                         websocket.send_bytes(b_data.read())
                     elif isinstance(segment, TextSegment):
                         print(segment.content)
