@@ -37,60 +37,63 @@ print("finished building system")
 
 @router.websocket("/ws/S2ST/", name='stream')
 async def speech_to_speech_translation(websocket: WebSocket):
-    try:
-        await websocket.accept()
+    
+    await websocket.accept()
 
-        tgt_lang = 'eng'
-        source_segment_size = 320
-        b_data = io.BytesIO()
+    tgt_lang = 'eng'
+    source_segment_size = 320
+    b_data = io.BytesIO()
+
+    while True:
+        try:
+            baudio = await websocket.receive_bytes()
+            
+            with open(f'/home/ubuntu/translator_api/audios/input_audio.wav', 'wb') as file:
+                file.write(baudio)
+
+        except asyncio.TimeoutError:
+            print("La conexión se ha agotado.")
+            break
+
+        audio_frontend = AudioFrontEnd(
+            wav_data=baudio,
+            segment_size=source_segment_size,
+        )
 
         while True:
-            try:
-                baudio = await websocket.receive_bytes()
-                
-                with open(f'/home/ubuntu/translator_api/audios/input_audio.wav', 'wb') as file:
-                    file.write(baudio)
+            input_segment = audio_frontend.send_segment()
+            input_segment.tgt_lang = tgt_lang
 
-            except asyncio.TimeoutError:
-                print("La conexión se ha agotado.")
+            if input_segment.finished:
+                get_states_root(system, system_states).source_finished = True
+            output_segments = OutputSegments(system.pushpop(input_segment, system_states))
+
+            if not output_segments.is_empty:
+
+                for segment in output_segments.segments:
+                    if isinstance(segment, SpeechSegment):
+                        # restart buffer
+                        b_data.seek(0)
+                        b_data.truncate(0)
+                        b_data.flush()  
+
+                        audio_tensor = torch.tensor(segment.content, dtype=torch.float32).unsqueeze(0)
+                        torchaudio.save(b_data, audio_tensor, 16000)
+                        websocket.send_bytes(b_data.read())
+                    elif isinstance(segment, TextSegment):
+                        print(segment.content)
+
+            if output_segments.finished:
+                print("End of VAD segment")
+                reset_states(system, system_states)
+            if input_segment.finished:
+                assert output_segments.finished
                 break
+    
+    # try:
+        
 
-            audio_frontend = AudioFrontEnd(
-                wav_data=baudio,
-                segment_size=source_segment_size,
-            )
-
-            while True:
-                input_segment = audio_frontend.send_segment()
-                input_segment.tgt_lang = tgt_lang
-
-                if input_segment.finished:
-                    get_states_root(system, system_states).source_finished = True
-                output_segments = OutputSegments(system.pushpop(input_segment, system_states))
-
-                if not output_segments.is_empty:
-
-                    for segment in output_segments.segments:
-                        if isinstance(segment, SpeechSegment):
-                            # restart buffer
-                            b_data.seek(0)
-                            b_data.truncate(0)
-                            b_data.flush()  
-
-                            audio_tensor = torch.tensor(segment.content, dtype=torch.float32).unsqueeze(0)
-                            torchaudio.save(b_data, audio_tensor, 16000)
-                            websocket.send_bytes(b_data.read())
-                        elif isinstance(segment, TextSegment):
-                            print(segment.content)
-
-                if output_segments.finished:
-                    print("End of VAD segment")
-                    reset_states(system, system_states)
-                if input_segment.finished:
-                    assert output_segments.finished
-                    break
-
-    except WebSocketDisconnect:
-        print("Cliente desconectado.")
-    except Exception as e:
-        print("Error inesperado:", e)
+    # except WebSocketDisconnect:
+    #     print("Cliente desconectado.")
+    # except Exception as e:
+    #     print("Error inesperado:", e)
