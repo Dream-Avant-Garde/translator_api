@@ -56,7 +56,7 @@ async def speech_to_speech_translation(websocket: WebSocket):
                 break
 
             audio_frontend = AudioFrontEnd(
-                wav_data=audio,
+                wav_data=baudio,
                 segment_size=source_segment_size,
             )
 
